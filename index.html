@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+</head>
+
+<body>
+    <div class="container">
+        <form> 
+            <h2> <p>Image Upload </p>
+                 <small>For Mobile it will open the camera instead of folder directory and 
+                     capture the image and placed it into respective folder</small>
+             </h2> 
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="form-group ">
+                        <label for="exampleInputFile">File input</label>
+                        <input type="file" id="fileInput" accept="image/*" name="fileInput" capture="camera">
+                    </div> 
+                    <button type="button" class="btn btn-default" id="submitBtn">Submit</button>
+                </div>
+                <div class="col-lg-6"> 
+                        <p class="help-block">Image output here.....</p>
+                        <div class="output"></div>
+                </div>
+             </div> 
+        </form>
+        <div class="row">
+            <h3>Get All Images <button type="button" class="btn btn-primary getList">Get Images</button></h3>
+            <div class="row listImages"></div>
+             
+        </div>
+    </div> 
+<script src="https://code.jquery.com/jquery-2.2.4.js" integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI=" crossorigin="anonymous"></script> 
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script type="text/javascript">
+    $(document).ready(function(){
+
+        $("#submitBtn").on("click", function(){ 
+            var fileData = new FormData();
+            console.log(jQuery('#fileInput').get(0).files);
+            fileData.append('file', jQuery('#fileInput').get(0).files[0]);
+            $.ajax({
+                url : "upload.php",
+                method:"POST",
+                data : fileData,
+                processData : false,
+                cache : false,
+                contentType: false,
+                beforeSend : function(){
+                     $(".output").html("image loading.....");
+                },
+                success : function(data){ 
+                    $(".output").html(data);
+                },
+                error : function(){ 
+                    console.log("ERROR");
+                }
+            });
+        });
+        $(".getList").on("click", function(){
+            $(".listImages").html("");
+            $.ajax({
+                url : "getList.php",
+                method:"POST", 
+                success : function(data){
+                    console.log(data);
+                    data = $.parseJSON(data); 
+                    $.each(data, function(i, val){
+                        var mediastr = '<div class="col-lg-3"><div class"media"><div class="media-left"> <a href="#" class="imgSrc">';
+                        mediastr += '<img class="media-object img-circle" src="'+val[2]+val[1]+'" width="100" height="100" alt="default"></a>';
+                        mediastr += '</div>';
+                        mediastr += '<div class="media-body"><br /><br /><h4 class="media-heading imgName">'+val[1]+'</h4> </div></div><br /></div>';
+                        $(".listImages").append(mediastr);
+                    }); 
+                },
+                error : function(){ 
+                    console.log("ERROR");
+                }
+            });
+        });
+
+
+    });
+</script>
+
+</body>
+
+</html>
